@@ -57,8 +57,24 @@ public class PostController {
         List<String> authors=new ArrayList<String>();
         List<String> tags=new ArrayList<String>();
 
-        authors.addAll(postService.getAuthors());
-        tags.addAll(tagService.getTags());
+//        authors.addAll(postService.getAuthors());
+//        tags.addAll(tagService.getTags());
+
+        for (int pageIndex = 0; pageIndex < postsPage.getTotalPages(); pageIndex++) {
+
+            Pageable newPageable = PageRequest.of(pageIndex, postsPage.getSize());
+            Page<Post> pageResults = postService.getPostsPage(newPageable);
+            for (Post post : pageResults.getContent()) {
+                String author = post.getAuthor();
+                Set<Tag> postTags = post.getTags();
+
+                authors.add(author);
+
+                for (Tag tag : postTags) {
+                    tags.add(tag.getName());
+                }
+            }
+        }
 
         model.addAttribute("authors", authors);
         model.addAttribute("tags", tags);
